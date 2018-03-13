@@ -7,7 +7,7 @@ class TodoPage extends React.Component {
     super (props, context);
     this.state = {
       task: '',
-      todos: []
+      todosObj: props.store
     //   // errors: {},
     //   // saving: false
     };
@@ -15,6 +15,19 @@ class TodoPage extends React.Component {
     this.taskChange = this.taskChange.bind(this);
     this.taskToggle = this.taskToggle.bind(this);
     this.taskRemove = this.taskRemove.bind(this);
+    this.onStoreChange = this.onStoreChange.bind(this);
+  }
+
+  onStoreChange () {
+    this.setState(() => ( { todosObj: this.props.store } ));
+  }
+
+  componentDidMount(){
+    this.subscriptionId = this.props.store.subscribe(this.onStoreChange);
+  }
+
+  componentWillUnmount(){
+    this.props.store.unsubscribe(this.subscriptionId);
   }
 
   todoEnter (event) {
@@ -50,12 +63,14 @@ class TodoPage extends React.Component {
 
   taskRemove (event){
     let index = event.target.dataset.index;
-    this.setState((prevState, props) => (
-      { todos: prevState.todos.filter((e, i) => i != index ) }
-    ));
+    this.state.todosObj.removeTask(index);
+    // this.setState((prevState, props) => (
+    //   { todos: prevState.todos.filter((e, i) => i != index ) }
+    // ));
   }
 
   render() {
+    let todos = this.state.todosObj.todos.getTodos();
     return (
       <section className="todoapp">
         <header className="header">
@@ -66,7 +81,7 @@ class TodoPage extends React.Component {
         <section className="main">
           <input id="toggle-all" className="toggle-all" type="checkbox" />
           <label htmlFor="toggle-all">Mark all as complete</label>
-          <TodoList list={ this.state.todos } taskToggle={ this.taskToggle } taskRemove={ this.taskRemove } />
+          <TodoList list={ todos } taskToggle={ this.taskToggle } taskRemove={ this.taskRemove } />
         </section>
         {/* This footer should hidden by default and shown when there are todos */}
         <footer className="footer">

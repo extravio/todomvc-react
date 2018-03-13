@@ -15,6 +15,10 @@ export class Todos {
     this.todos.push(new Task(task));
   }
 
+  removeTask(index) {
+    this.todos = this.todos.filter((e, i) => i != index);
+  }
+
   getTodos() {
     return this.todos;
   }
